@@ -80,7 +80,10 @@
       </header>
       <div class="mt-4 border-t pt-4 border-t-gray-300">
         <label class="text-sm font-semisemibold text-gray-900">Select Volume:</label>
-        <div class="flex gap-2 mt-2">
+        <div class="py-5 w-full grid sm:grid-cols-2 gap-4">
+          <div>
+            {% include 'partials/_cart_toggle_button.html' with product=product cart=cart %}
+          </div>
           <button 
             @click="filterByVolume(null)" 
             class="cursor-pointer px-3 py-1 text-sm border rounded-sm"

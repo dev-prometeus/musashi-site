@@ -72,6 +72,8 @@ TEMPLATES = [
 
                 # my context context processors
                 'django.template.context_processors.media',
+
+                'products.context_processors.cart',
             ],
         },
     },

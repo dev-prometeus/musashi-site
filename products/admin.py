@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Category, ProductInstruction, ProductDetailsItem, ProductVolume, Vehicle, Product, ProductImage, ProductVariant
+from .models import Category, ProductInstruction, ProductDetailsItem, ProductVolume, Vehicle, Product, ProductImage, ProductVariant, Order, OrderItem
 from unfold.admin import ModelAdmin, TabularInline
 from .forms import ProductAdminForm, ProductInstructionAdminForm
 
@@ -69,3 +69,21 @@ class ProductVolumeAdmin(ModelAdmin):
 class VehicleAdmin(ModelAdmin):
     list_display = ['make', 'model']
     ordering = ['make', 'model']
+
+
+class OrderItemInline(TabularInline):
+    model = OrderItem
+    extra = 0
+    tab = True
+    fields = ('product', 'volume', 'quantity', 'unit_price')
+    readonly_fields = ()
+
+
+@admin.register(Order)
+class OrderAdmin(ModelAdmin):
+    inlines = [OrderItemInline]
+    list_display = ['id', 'customer_name', 'phone_number', 'telegram_number', 'status', 'total_amount', 'date_created']
+    list_filter = ['status', 'date_created']
+    search_fields = ['customer_name', 'phone_number', 'telegram_number', 'full_address']
+    readonly_fields = ['total_amount', 'date_created', 'date_modified']
+    ordering = ['-date_created', '-id']

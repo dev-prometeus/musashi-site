@@ -1,0 +1,25 @@
+{% load static %}
+
+<form
+  hx-post="{% url 'cart_toggle' product.id %}"
+  hx-target="this"
+  hx-swap="outerHTML"
+  class="w-full"
+>
+  {% csrf_token %}
+  {% if cart and product.id in cart %}
+    <button
+      type="submit"
+      class="w-full inline-flex items-center justify-center text-sm font-semibold text-gray-900 py-2.5 px-4 rounded-full border border-gray-300 hover:bg-gray-50 transition-colors"
+    >
+      Remove from cart
+    </button>
+  {% else %}
+    <button
+      type="submit"
+      class="w-full inline-flex items-center justify-center text-sm font-semibold text-gray-100 py-2.5 px-4 rounded-full bg-gray-900 hover:bg-gray-800 transition-colors"
+    >
+      Add to cart
+    </button>
+  {% endif %}
+</form>

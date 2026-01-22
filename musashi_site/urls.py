@@ -3,11 +3,14 @@ from django.urls import path, include
 from django.conf.urls.static import static
 from django.conf import settings
 from base.views import tinymce_image_upload
+from products import views as product_views
 
 
 urlpatterns = [
     path('siteadmin/', admin.site.urls),
     path('', include('base.urls')),
+    path('cart/', product_views.cart),
+    path('checkout/', product_views.checkout),
     path('products/', include('products.urls')),
 
     path('tinymce/', include('tinymce.urls')),

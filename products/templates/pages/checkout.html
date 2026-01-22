@@ -1,0 +1,152 @@
+{% extends "layout/layout.html" %}
+{% load static %}
+
+{% block title %}Checkout{% endblock title %}
+
+{% block content %}
+<script src="https://cdn.tailwindcss.com"></script>
+<main class="w-full max-w-4xl lg:max-w-7xl mx-auto min-h-[80dvh] px-4 pt-12 pb-24">
+
+  <header class="mb-10">
+    <h1 class="text-3xl md:text-5xl font-extrabold tracking-tight text-gray-900">Checkout</h1>
+    <p class="text-gray-500 mt-3 text-lg">Enter your delivery details to place your order.</p>
+  </header>
+
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+
+    <aside class="lg:col-span-5 lg:sticky lg:top-8 order-2 lg:order-1">
+      <div class="border border-gray-200 rounded-3xl p-8 bg-gray-50/50 shadow-sm">
+        <div class="flex items-center justify-between mb-8">
+          <h2 class="text-xl font-bold text-gray-900">Order Items</h2>
+          <span class="text-sm font-medium bg-gray-200 text-gray-700 px-3 py-1 rounded-full">
+            {% if cart %}{{ cart.count }}{% else %}0{% endif %} Items
+          </span>
+        </div>
+
+        {% if cart_lines %}
+          <ul class="space-y-6">
+            {% for line in cart_lines %}
+              <li class="flex gap-4 items-center">
+                <div class="relative w-20 h-20 bg-white border border-gray-100 rounded-2xl overflow-hidden flex-shrink-0">
+                  {% if line.product.images.all.0.image %}
+                    <img src="{% get_media_prefix %}{{ line.product.images.all.0.image }}" alt="{{ line.product.name }}" class="w-full h-full object-contain p-2">
+                  {% else %}
+                    <img src="{% static 'images/sample-product.png' %}" alt="{{ line.product.name }}" class="w-full h-full object-contain p-2">
+                  {% endif %}
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p class="font-bold text-gray-900 truncate">{{ line.product.name }}</p>
+                  <p class="text-sm text-gray-500">Qty: {{ line.quantity }}</p>
+                </div>
+                <p class="font-bold text-gray-900">${{ line.line_total|floatformat:2 }}</p>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <div class="rounded-2xl border border-gray-200 bg-white p-6">
+            <p class="font-bold text-gray-900">Your cart is empty.</p>
+            <p class="text-gray-500 mt-2 text-sm">Add products before checking out.</p>
+            <a href="{% url 'products' %}" class="mt-5 inline-flex items-center justify-center w-full bg-gray-900 text-white font-bold py-3 px-6 rounded-2xl hover:bg-black transition-colors">
+              Browse products
+            </a>
+          </div>
+        {% endif %}
+
+        <div class="mt-8 border-t border-gray-200 pt-6 space-y-4">
+          <div class="flex items-center justify-between text-gray-600">
+            <span>Subtotal</span>
+            <span class="font-bold text-gray-900">${{ cart_subtotal|floatformat:2 }}</span>
+          </div>
+          <div class="flex items-center justify-between text-gray-600">
+            <span>Shipping</span>
+            <span class="text-emerald-600 font-bold italic underline">Calculated later</span>
+          </div>
+          <div class="flex items-center justify-between text-2xl font-black border-t border-gray-200 pt-5">
+            <span class="text-gray-900">Total</span>
+            <span class="text-gray-900">${{ cart_subtotal|floatformat:2 }}</span>
+          </div>
+        </div>
+
+        <div class="mt-7 grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <a href="{% url 'products' %}" class="inline-flex items-center justify-center text-sm font-bold text-gray-900 py-3 px-6 rounded-2xl border border-gray-300 hover:bg-white transition-colors">
+            Continue shopping
+          </a>
+          <a href="{% url 'cart' %}" class="inline-flex items-center justify-center text-sm font-bold text-white py-3 px-6 rounded-2xl bg-gray-900 hover:bg-black transition-colors">
+            Back to cart
+          </a>
+        </div>
+      </div>
+    </aside>
+
+    <section class="lg:col-span-7 order-1 lg:order-2">
+      <div class="bg-white">
+        <h2 class="text-2xl font-bold text-gray-900">Delivery Details</h2>
+        <p class="text-gray-500 mt-2">We’ll use this to contact you and deliver your order.</p>
+
+        <form class="mt-10 space-y-8" method="post" action="#">
+          {% csrf_token %}
+
+          <div class="space-y-2">
+            <label for="name" class="block text-sm font-bold text-gray-700 uppercase tracking-wider">Name</label>
+            <input id="name" name="name" type="text" autocomplete="name" placeholder="John Doe"
+              class="w-full px-5 py-4 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-black focus:border-black transition-all outline-none text-gray-900 font-medium" required>
+          </div>
+
+          <div class="space-y-2">
+            <label for="address" class="block text-sm font-bold text-gray-700 uppercase tracking-wider">Full Address</label>
+            <textarea id="address" name="address" rows="3" autocomplete="street-address" placeholder="House number, street, commune, district..."
+              class="w-full px-5 py-4 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-black focus:border-black transition-all outline-none text-gray-900 font-medium" required></textarea>
+          </div>
+
+          <div class="space-y-2">
+            <label for="map_link" class="block text-sm font-bold text-gray-700 uppercase tracking-wider">Google Map Link</label>
+            <input id="map_link" name="map_link" type="url" inputmode="url" placeholder="https://maps.google.com/..."
+              class="w-full px-5 py-4 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-black focus:border-black transition-all outline-none text-gray-900 font-medium" required>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="space-y-2">
+              <label for="phone" class="block text-sm font-bold text-gray-700 uppercase tracking-wider">Phone Number</label>
+              <input id="phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="012 345 678"
+                class="w-full px-5 py-4 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-black focus:border-black transition-all outline-none text-gray-900 font-medium" required>
+            </div>
+            <div class="space-y-2">
+              <label for="telegram" class="block text-sm font-bold text-gray-700 uppercase tracking-wider">Telegram number</label>
+              <input id="telegram" name="telegram" type="tel" inputmode="tel" placeholder="@username or number"
+                class="w-full px-5 py-4 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-black focus:border-black transition-all outline-none text-gray-900 font-medium" required>
+            </div>
+          </div>
+
+          <div class="flex gap-4 p-5 rounded-2xl bg-blue-50 border border-blue-100">
+            <div class="flex-shrink-0">
+              <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
+            <div>
+              <p class="text-sm font-bold text-blue-900">What happens after you order?</p>
+              <p class="text-sm text-blue-700 mt-1">
+                Your order details will be sent to our admin team. A representative will contact you via Phone or Telegram to confirm delivery and payment.
+              </p>
+            </div>
+          </div>
+
+          <div class="pt-2">
+            <button type="submit"
+              class="w-full bg-gray-900 text-white font-extrabold py-5 px-8 rounded-2xl hover:bg-black hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center justify-center gap-3 group"
+              {% if not cart_lines %}disabled{% endif %}
+            >
+              Confirm & Place Order
+              <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+            </button>
+            {% if not cart_lines %}
+              <p class="text-sm text-gray-500 mt-3">Add items to your cart to place an order.</p>
+            {% endif %}
+          </div>
+        </form>
+      </div>
+    </section>
+
+  </div>
+</main>
+{% endblock %}
